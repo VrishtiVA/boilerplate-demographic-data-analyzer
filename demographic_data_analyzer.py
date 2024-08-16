@@ -9,32 +9,39 @@ def calculate_demographic_data(print_data=True):
 
     # How many of each race are represented in this dataset? 
     # This should be a Pandas series with race names as the index labels.
-    race_count = None
+
+    counts = np.zeros(len(races), np.int32)
+    for index, race in enumerate(races):
+        counts[index] = df[ df['race'] == race ]['race'].count()
+
+    race_count = pd.Series(counts, index=[races], name="Race_Count")
 
     # What is the average age of men?
-    average_age_men = None
+    average_age_men = df[ df['sex'] == 'Male' ]['age'].mean()
 
     # What is the percentage of people who have a Bachelor's degree?
-    percentage_bachelors = None
+    bachelors = df['education'][ df['education'] == 'Bachelors' ].count()
+
+    percentage_bachelors = (bachelors/df.shape[0]) * 100
 
     # What percentage of people with advanced education (`Bachelors`, `Masters`, or `Doctorate`) make more than 50K?
     # What percentage of people without advanced education make more than 50K?
 
     # with and without `Bachelors`, `Masters`, or `Doctorate`
-    higher_education = None
-    lower_education = None
+    higher_education = df[ (df['education'] == 'Bachelors') | (df['education'] == 'Masters') | (df['education'] == 'Doctorate') ]
+    lower_education = df[ (df['education'] != 'Bachelors') & (df['education'] != 'Masters') & (df['education'] != 'Doctorate') ]
 
     # percentage with salary >50K
-    higher_education_rich = None
-    lower_education_rich = None
+    higher_education_rich = (higher_education['salary'][ higher_education['salary'] == '>50K' ].count() / higher_education['salary'].count() ) * 100 
+    lower_education_rich = (lower_education['salary'][ lower_education['salary'] == '>50K' ].count() / lower_education['salary'].count() ) * 100
 
     # What is the minimum number of hours a person works per week (hours-per-week feature)?
-    min_work_hours = None
+    min_work_hours = df['hours-per-week'].min()
 
     # What percentage of the people who work the minimum number of hours per week have a salary of >50K?
-    num_min_workers = None
+    num_min_workers = df['hours-per-week'][ df['hours-per-week'] == df['hours-per-week'].min() ].count()
 
-    rich_percentage = None
+    rich_percentage = (df[ (df['hours-per-week'] == df['hours-per-week'].min()) & (df['salary'] == '>50K') ].count() / num_min_workers) * 100
 
     # What country has the highest percentage of people that earn >50K?
     highest_earning_country = None
